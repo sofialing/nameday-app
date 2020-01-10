@@ -7,23 +7,40 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="/assets/css/">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <title>Nameday app</title>
 </head>
 
 <body>
     <div class="container">
-        <form id="name-search">
-            <div class="input-group mb-3">
-                <input type="text" class="form-control" placeholder="Search for name..." aria-label="Search for name..."
-                    aria-describedby="button-addon2">
+
+        <form id="name-search" class="mb-3">
+            <div class="input-group mb-2">
+                <input type="text" class="form-control" placeholder="Search name day by name..." id="name">
                 <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="button-addon2">Search</button>
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">&#128269;</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">Select country</label>
+                </div>
+                <select class="custom-select" id="country">
+                </select>
+            </div>
+        </form>
+
+        <form id="date-search">
+            <div class="input-group mb-3">
+                <input type="date" class="form-control" placeholder="Get name day for a specific day..." id="date">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit" id="button-addon2">&#128269;</button>
                 </div>
             </div>
         </form>
     </div>
 
+    <script src="/assets/script/nameday.js"></script>
     <script src="/assets/script/app.js"></script>
 </body>
 
