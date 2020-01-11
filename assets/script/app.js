@@ -6,6 +6,7 @@
 const nameSearch = document.querySelector('#name-search');
 const dateSearch = document.querySelector('#date-search');
 
+// Render a list of availabe countries
 const renderCountryList = () => {
 	const countryList = [
 		{
@@ -66,38 +67,88 @@ const renderCountryList = () => {
 		}
 	];
 
+	// Append countries as options to select element
 	countryList.forEach(country => {
-		nameSearch.country.innerHTML += `<option value="${country.code}">${country.name}</option>`;
+		document.querySelector(
+			'#country'
+		).innerHTML += `<option value="${country.code}-${country.name}">${country.name}</option>`;
 	});
 };
 
-const handleError = e => {
-	console.log(e);
+// Handle error messages and render to page
+const handleError = message => {
+	const html = `<div class="alert alert-warning" role="alert">${message}</div>`
+	document.querySelector('#nameday').innerHTML = html;
 };
 
-const handleResult = res => {
-	console.log('got result:', res);
+// Handle search results for name search, set variables
+const handleNameResult = (res, search) => {
+	if (!res.results.length) {
+		handleError('No name day found.');
+		return;
+	}
+
+	const name = res.results[0].name.split(', ').filter(name => name.toLowerCase() === search.toLowerCase());
+	const nameList = res.results[0].name.split(', ').filter(name => name.toLowerCase() !== search.toLowerCase());
+	const date = moment().month(res.results[0].month - 1).date(res.results[0].day).format('dddd, MMMM Do');
+	const country = res['country name'];
+
+	renderNameSearch({ name, nameList, date, country });
 };
 
+// Render results of search by specific name
+const renderNameSearch = ({ name, nameList, date, country }) => {
+	nameList = nameList.length ? nameList.join(', ') : 'no other names.'
+
+	const html = `
+		<div class="card">
+			<div class="card-body text-center">
+				<h2 class="font-weight-bold">${name}</h2>
+				<p>${date} (${country})</p>
+				<p class="text-muted">More on this day: ${nameList}</p>
+			</div>
+		</div>`
+	document.querySelector('#nameday').innerHTML = html;
+}
+
+// Render results of search by specific date
+const renderDateSearch = (res, country) => {
+	const date = moment().month(res.data[0].dates.month - 1).date(res.data[0].dates.day).format('dddd, MMMM Do');
+	const html = `
+		<div class="card">
+			<div class="card-body text-center">
+				<h2 class="font-weight-bold">${date}</h2>
+				<p>${res.data[0].namedays[country.slice(0, 2)]}</p>
+				<p>(${country.slice(3)})</p>
+			</div>
+		</div>`
+	document.querySelector('#nameday').innerHTML = html;
+}
+
+// Search by specific name when form is being submitted
 nameSearch.addEventListener('submit', e => {
 	e.preventDefault();
 	const name = nameSearch.name.value.trim();
-	const country = nameSearch.country.value;
+	const country = document.querySelector('#country').value.slice(0, 2);
 
 	searchByName(name, country)
-		.then(handleResult)
+		.then(res => handleNameResult(res, name))
 		.catch(handleError);
 });
 
+// Search by specific date when form is being submitted
 dateSearch.addEventListener('submit', e => {
 	e.preventDefault();
-	const date = dateSearch.date.value.trim();
-	const month = new Date(date).getMonth() + 1;
-	const day = new Date(date).getDate();
+	const inputDate = dateSearch.date.value.trim();
+	const month = moment(inputDate).month() + 1;
+	const day = moment(inputDate).date();
+	const country = document.querySelector('#country').value;
+	const countryCode = country.slice(0, 2);
 
-	searchByDate(month, day)
-		.then(handleResult)
+	searchByDate(month, day, countryCode)
+		.then(res => renderDateSearch(res, country))
 		.catch(handleError);
 });
 
+// Render country list when page is being loaded
 renderCountryList();
