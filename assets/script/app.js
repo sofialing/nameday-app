@@ -68,7 +68,7 @@ const renderCountryList = () => {
 
 	// Append countries as options to select element
 	countryList.forEach(country => {
-		const html = `<option value="${country.code}-${country.name}">${country.name}</option>`;
+		const html = `<option value="${country.code}">${country.name}</option>`;
 		document.querySelector('#country').innerHTML += html;
 	});
 };
@@ -102,21 +102,43 @@ const handleNameResult = (res, search) => {
 		.format('dddd, MMMM Do');
 
 	// Get country name
-	const country = res['country name'];
+	const country = res['country code'];
 
-	renderNameSearch({ name, nameList, date, country });
+	renderNameSearch(name, nameList, date, country);
+};
+
+const handleDateSearch = (res, country) => {
+	// Check if search got no results & render message
+	if (!res.data.length) {
+		renderError('No name day found on this day.');
+		return;
+	}
+	// Format date of the name day
+	const date = moment()
+		.month(res.data[0].dates.month - 1)
+		.date(res.data[0].dates.day)
+		.format('dddd, MMMM Do');
+
+	// Format names as a list
+	const nameList = res.data[0].namedays[country]
+		.split(', ')
+		.map(name => `<li>${name}</li>`)
+		.join('');
+
+	renderDateSearch(date, nameList, country);
 };
 
 // Render results of search by specific name
-const renderNameSearch = ({ name, nameList, date, country }) => {
+const renderNameSearch = (name, nameList, date, country) => {
 	const html = `
 		<div class="card">
 			<div class="card-body text-center">
+				<img src="/assets/img/${country}.svg" class="flag-icon">
 				<h2 class="font-weight-bold">${name}</h2>
-				<p>${date} (${country})</p>
-				<p class="text-muted">
+				<p class="date">${date}</p>
+				<p class="text-muted mb-0">
 					More on this day: 
-					${nameList.length ? nameList : 'no more this day.'}
+					<span class="name-list">${nameList.length ? nameList : 'no one'}</span>
 				</p>
 			</div>
 		</div>`;
@@ -124,19 +146,14 @@ const renderNameSearch = ({ name, nameList, date, country }) => {
 };
 
 // Render results of search by specific date
-const renderDateSearch = (res, country) => {
-	// Format date of the name day
-	const date = moment()
-		.month(res.data[0].dates.month - 1)
-		.date(res.data[0].dates.day)
-		.format('dddd, MMMM Do');
-
+const renderDateSearch = (date, nameList, country) => {
+	console.log(nameList);
 	const html = `
 		<div class="card">
 			<div class="card-body text-center">
+				<img src="/assets/img/${country}.svg" class="flag-icon">
 				<h2 class="font-weight-bold">${date}</h2>
-				<p>${res.data[0].namedays[country.slice(0, 2)]}</p>
-				<p>(${country.slice(3)})</p>
+				<ul class="name-list">${nameList}</ul>
 			</div>
 		</div>`;
 	resultEl.innerHTML = html;
@@ -150,7 +167,7 @@ nameSearch.addEventListener('submit', async e => {
 	const name = nameSearch.name.value.trim();
 
 	// Get country code of selected country
-	const country = document.querySelector('#country').value.slice(0, 2);
+	const country = document.querySelector('#country').value;
 
 	//Get data and handle results
 	searchByName(name, country)
@@ -169,11 +186,10 @@ dateSearch.addEventListener('submit', e => {
 
 	// Get selected country and country code
 	const country = document.querySelector('#country').value;
-	const countryCode = country.slice(0, 2);
 
 	// Get data and handle results
-	searchByDate(month, day, countryCode)
-		.then(res => renderDateSearch(res, country))
+	searchByDate(month, day, country)
+		.then(res => handleDateSearch(res, country))
 		.catch(renderError);
 });
 
