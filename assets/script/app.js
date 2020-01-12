@@ -190,9 +190,6 @@ nameSearch.addEventListener('submit', async e => {
 	searchByName(name, country)
 		.then(res => handleNameResult(res, name))
 		.catch(renderError);
-
-	// Reset input field
-	nameSearch.reset();
 });
 
 // Search by specific date when form is being submitted
@@ -211,9 +208,6 @@ dateSearch.addEventListener('submit', e => {
 	searchByDate(month, day, country)
 		.then(res => handleDateSearch(res, country))
 		.catch(renderError);
-
-	// Reset input field
-	dateSearch.reset();
 });
 
 // Search for today's naming day when a country is selected
