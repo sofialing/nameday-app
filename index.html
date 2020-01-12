@@ -16,7 +16,7 @@
         <section class="my-5">
             <h1 class="text-muted text-center my-4">Name day search</h1>
             <form id="name-search" class="mb-2">
-                <small class="form-text text-muted">Enter a name...</small>
+                <small class="form-text text-muted mb-1">Enter a name...</small>
                 <div class="input-group mb-2">
                     <input type="text" class="form-control" placeholder="Search by name..." id="name" required>
                     <div class="input-group-append">
@@ -26,7 +26,7 @@
             </form>
 
             <form id="date-search">
-                <small class="form-text text-muted">...or enter a date.</small>
+                <small class="form-text text-muted mb-1">...or enter a date.</small>
                 <div class="input-group mb-2">
                     <input type="date" class="form-control" placeholder="Search by date..." id="date" required>
                     <div class="input-group-append">
@@ -35,10 +35,10 @@
                 </div>
             </form>
 
-            <small class="form-text text-muted">Select a country.</small>
+            <small class="form-text text-muted mb-1">Select a country.</small>
             <div class="input-group mb-2">
                 <div class="input-group-prepend">
-                    <label class="input-group-text" for="inputGroupSelect01">Country</label>
+                    <label class="input-group-text" for="country">Country</label>
                 </div>
                 <select class="custom-select" id="country">
                 </select>
@@ -47,6 +47,15 @@
 
         <section id="nameday">
         </section>
+
+        <small class="form-text text-muted mb-1">Show name days for TODAY</small>
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="today">Country</label>
+            </div>
+            <select class="custom-select" id="today">
+            </select>
+        </div>
     </div>
 
     <script src="/assets/script/moment.js"></script>
