@@ -10,65 +10,79 @@ const renderCountryList = () => {
 	const countryList = [
 		{
 			name: 'Austria',
-			code: 'at'
+			code: 'at',
+			timeZone: 'Europe/Vienna'
 		},
 		{
 			name: 'Czechia',
-			code: 'cz'
+			code: 'cz',
+			timeZone: 'Europe/Prague'
 		},
 		{
 			name: 'Germany',
-			code: 'de'
+			code: 'de',
+			timeZone: 'Europe/Berlin'
 		},
 		{
 			name: 'Denmark',
-			code: 'dk'
+			code: 'dk',
+			timeZone: 'Europe/Copenhagen'
 		},
 		{
 			name: 'Spain',
-			code: 'es'
+			code: 'es',
+			timeZone: 'Europe/Madrid'
 		},
 		{
 			name: 'Finland',
-			code: 'fi'
+			code: 'fi',
+			timeZone: 'Europe/Helsinki'
 		},
 		{
 			name: 'France',
-			code: 'fr'
+			code: 'fr',
+			timeZone: 'Europe/Paris'
 		},
 		{
 			name: 'Croatia',
-			code: 'hr'
+			code: 'hr',
+			timeZone: 'Europe/Zagreb'
 		},
 		{
 			name: 'Hungary',
-			code: 'hu'
+			code: 'hu',
+			timeZone: 'Europe/Budapest'
 		},
 		{
 			name: 'Italy',
-			code: 'it'
+			code: 'it',
+			timeZone: 'Europe/Rome'
 		},
 		{
 			name: 'Poland',
-			code: 'pl'
+			code: 'pl',
+			timeZone: 'Europe/Warsaw'
 		},
 		{
 			name: 'Sweden',
-			code: 'se'
+			code: 'se',
+			timeZone: 'Europe/Stockholm'
 		},
 		{
 			name: 'Slovakia',
-			code: 'sk'
+			code: 'sk',
+			timeZone: 'Europe/Bratislava'
 		},
 		{
 			name: 'United States of America',
-			code: 'us'
+			code: 'us',
+			timeZone: 'America/Toronto'
 		}
 	];
 
 	// Append countries as options to select element
 	countryList.forEach(country => {
-		const html = `<option value="${country.code}">${country.name}</option>`;
+		const html = `<option value="${country.code}-${country.timeZone}">${country.name}</option>`;
 		document.querySelector('#country').innerHTML += html;
 	});
 };
@@ -147,7 +161,6 @@ const renderNameSearch = (name, nameList, date, country) => {
 
 // Render results of search by specific date
 const renderDateSearch = (date, nameList, country) => {
-	console.log(nameList);
 	const html = `
 		<div class="card">
 			<div class="card-body text-center">
@@ -167,7 +180,7 @@ nameSearch.addEventListener('submit', async e => {
 	const name = nameSearch.name.value.trim();
 
 	// Get country code of selected country
-	const country = document.querySelector('#country').value;
+	const country = document.querySelector('#country').value.slice(0, 2);
 
 	// Get data and handle results
 	searchByName(name, country)
@@ -188,7 +201,7 @@ dateSearch.addEventListener('submit', e => {
 	const day = moment(inputDate).date();
 
 	// Get selected country and country code
-	const country = document.querySelector('#country').value;
+	const country = document.querySelector('#country').value.slice(0, 2);
 
 	// Get data and handle results
 	searchByDate(month, day, country)
