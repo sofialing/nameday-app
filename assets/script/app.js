@@ -81,10 +81,14 @@ const renderCountryList = () => {
 	];
 
 	// Append countries as options to select element
-	countryList.forEach(country => {
-		const html = `<option value="${country.code}-${country.timeZone}">${country.name}</option>`;
-		document.querySelector('#country').innerHTML += html;
-	});
+	let html = countryList
+		.map(
+			country =>
+				`<option value="${country.code}-${country.timeZone}">${country.name}</option>`
+		)
+		.join('');
+
+	document.querySelectorAll('select').forEach(list => (list.innerHTML = html));
 };
 
 // Handle error messages and render to page
@@ -212,5 +216,21 @@ dateSearch.addEventListener('submit', e => {
 	dateSearch.reset();
 });
 
+// Search for today's naming day when a country is selected
+document.querySelector('#today').addEventListener('change', e => {
+	const country = document.querySelector('#today').value.slice(0, 2);
+	const timeZone = document.querySelector('#today').value.slice(3);
+
+	// Get data and handle results
+	searchToday(country, timeZone)
+		.then(res => handleDateSearch(res, country))
+		.catch(renderError);
+});
+
 // Render country list when page is being loaded
 renderCountryList();
+
+// Render todays name day when page is being loaded
+searchToday()
+	.then(res => handleDateSearch(res, 'at'))
+	.catch(renderError);
