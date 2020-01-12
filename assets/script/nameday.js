@@ -22,7 +22,7 @@ const searchByDate = async (month, day, country = 'se') => {
 };
 
 // Search for name days today for specified country and timezone
-const searchToday = async (timeZone = 'Europe/Stockholm', country = 'se') => {
+const searchToday = async (country = 'at', timeZone = 'Europe/Vienna') => {
 	const query = `/today?timezone=${timeZone}&country=${country}`;
 	return await fetchData(query);
 };
