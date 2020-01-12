@@ -169,10 +169,13 @@ nameSearch.addEventListener('submit', async e => {
 	// Get country code of selected country
 	const country = document.querySelector('#country').value;
 
-	//Get data and handle results
+	// Get data and handle results
 	searchByName(name, country)
 		.then(res => handleNameResult(res, name))
 		.catch(renderError);
+
+	// Reset input field
+	nameSearch.reset();
 });
 
 // Search by specific date when form is being submitted
@@ -191,6 +194,9 @@ dateSearch.addEventListener('submit', e => {
 	searchByDate(month, day, country)
 		.then(res => handleDateSearch(res, country))
 		.catch(renderError);
+
+	// Reset input field
+	dateSearch.reset();
 });
 
 // Render country list when page is being loaded
