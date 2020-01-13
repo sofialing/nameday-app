@@ -1,0 +1,72 @@
+[
+	{
+		"name": "Austria",
+		"code": "at",
+		"time": "Europe/Vienna"
+	},
+	{
+		"name": "Czechia",
+		"code": "cz",
+		"time": "Europe/Prague"
+	},
+	{
+		"name": "Germany",
+		"code": "de",
+		"time": "Europe/Berlin"
+	},
+	{
+		"name": "Denmark",
+		"code": "dk",
+		"time": "Europe/Copenhagen"
+	},
+	{
+		"name": "Spain",
+		"code": "es",
+		"time": "Europe/Madrid"
+	},
+	{
+		"name": "Finland",
+		"code": "fi",
+		"time": "Europe/Helsinki"
+	},
+	{
+		"name": "France",
+		"code": "fr",
+		"time": "Europe/Paris"
+	},
+	{
+		"name": "Croatia",
+		"code": "hr",
+		"time": "Europe/Zagreb"
+	},
+	{
+		"name": "Hungary",
+		"code": "hu",
+		"time": "Europe/Budapest"
+	},
+	{
+		"name": "Italy",
+		"code": "it",
+		"time": "Europe/Rome"
+	},
+	{
+		"name": "Poland",
+		"code": "pl",
+		"time": "Europe/Warsaw"
+	},
+	{
+		"name": "Sweden",
+		"code": "se",
+		"time": "Europe/Stockholm"
+	},
+	{
+		"name": "Slovakia",
+		"code": "sk",
+		"time": "Europe/Bratislava"
+	},
+	{
+		"name": "United States of America",
+		"code": "us",
+		"time": "America/Toronto"
+	}
+]
