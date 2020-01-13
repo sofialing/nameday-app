@@ -15,7 +15,7 @@
     <div class="container my-5 mx-auto">
         <section class="my-5">
             <h1 class="text-muted text-center my-4">Name day search</h1>
-            <form id="name-search" class="mb-2">
+            <form id="search-name" class="mb-2">
                 <small class="form-text text-muted mb-1">Enter a name...</small>
                 <div class="input-group mb-2">
                     <input type="text" class="form-control" placeholder="Search by name..." id="name" required>
@@ -25,7 +25,7 @@
                 </div>
             </form>
 
-            <form id="date-search">
+            <form id="search-date">
                 <small class="form-text text-muted mb-1">...or enter a date.</small>
                 <div class="input-group mb-2">
                     <input type="date" class="form-control" placeholder="Search by date..." id="date" required>
@@ -40,20 +40,20 @@
                 <div class="input-group-prepend">
                     <label class="input-group-text" for="country">Country</label>
                 </div>
-                <select class="custom-select" id="country">
+                <select class="custom-select" id="search-country">
                 </select>
             </div>
         </section>
 
-        <section id="nameday">
+        <section id="search-result">
         </section>
 
-        <small class="form-text text-muted mb-1">Show name days for TODAY</small>
+        <small class="form-text text-muted mb-1">Show today's names</small>
         <div class="input-group mb-2">
             <div class="input-group-prepend">
                 <label class="input-group-text" for="today">Country</label>
             </div>
-            <select class="custom-select" id="today">
+            <select class="custom-select" id="search-today">
             </select>
         </div>
     </div>
