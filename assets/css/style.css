@@ -29,3 +29,7 @@ ul.name-list {
 ul.name-list li {
 	margin: 0.5rem 0.5rem 0rem;
 }
+
+.input-group-text {
+	min-width: 100px;
+}
