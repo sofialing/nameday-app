@@ -30,7 +30,7 @@ const renderDateSearch = (date, namelist, country) => {
 	const html = `
 		<div class="card">
 			<div class="card-body text-center">
-				<img src="/assets/img/${country}.svg" class="flag-icon">
+				<img src="assets/img/${country}.svg" class="flag-icon">
 				<h2 class="h3 font-weight-bold">${date}</h2>
 				<p class="text-muted mb-0">
 					Names on this day:
@@ -47,7 +47,7 @@ const renderNameSearch = (name, namedays, country) => {
 		day =>
 			`<div class="card mb-3">
 				<div class="card-body text-center">
-					<img src="/assets/img/${country}.svg" class="flag-icon">
+					<img src="assets/img/${country}.svg" class="flag-icon">
 					<h2 class="h3 font-weight-bold">${name}</h2>
 					<p class="date">${day.date}</p>
 					<p class="text-muted mb-0">
