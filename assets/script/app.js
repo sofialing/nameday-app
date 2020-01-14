@@ -15,7 +15,7 @@ const renderAlert = message => {
 // Render list of supported countries to page
 const renderCountryList = async () => {
 	// Get data from json
-	const countries = await getData('../assets/script/countrylist.json');
+	const countries = await getData('assets/script/countrylist.json');
 
 	// Append countries as options to select element
 	const html = countries
