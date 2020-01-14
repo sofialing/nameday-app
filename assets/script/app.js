@@ -21,7 +21,8 @@ const renderCountryList = async () => {
 	const html = countries
 		.map(c => `<option value="${c.code}-${c.time}">${c.name}</option>`)
 		.join('');
-	document.querySelector('#search-country').innerHTML = html;
+
+	searchCountry.innerHTML = html;
 };
 
 // Render search results for specific date / day to page
@@ -31,7 +32,10 @@ const renderDateSearch = (date, namelist, country) => {
 			<div class="card-body text-center">
 				<img src="/assets/img/${country}.svg" class="flag-icon">
 				<h2 class="h3 font-weight-bold">${date}</h2>
-				<ul class="name-list">${namelist}</ul>
+				<p class="text-muted mb-0">
+					Names on this day:
+					<span class="name-list">${namelist}</span>
+				</p>
 			</div>
 		</div>`;
 	searchResult.innerHTML = html;
@@ -57,18 +61,15 @@ const renderNameSearch = (name, namedays, country) => {
 };
 
 // Format search results for specific date / day
-const formatDateResults = (res, country) => {
+const formatDateOutput = (res, country) => {
 	// Format the date of the the name day
 	const date = moment()
 		.month(res[0].dates.month - 1)
 		.date(res[0].dates.day)
 		.format('MMMM Do');
 
-	// Format names as list items
-	const namelist = res[0].namedays[country]
-		.split(', ')
-		.map(name => `<li>${name}</li>`)
-		.join('');
+	// Get list of names
+	const namelist = res[0].namedays[country];
 
 	renderDateSearch(date, namelist, country);
 };
@@ -96,9 +97,7 @@ const formatNameOutput = (res, search, country) => {
 
 	// Render alert message if there was no match
 	if (!namedays.length) {
-		renderAlert(
-			`No results for the name "${search}" in selected country (${country}).`
-		);
+		renderAlert(`No results for the name "${search}" in selected country.`);
 		return;
 	}
 
@@ -118,7 +117,7 @@ const searchByDate = async (date, country) => {
 			renderAlert(`No results for selected day.`);
 			return;
 		}
-		formatDateResults(res.data, country);
+		formatDateOutput(res.data, country);
 	} catch (err) {
 		renderAlert(err);
 	}
@@ -133,7 +132,7 @@ const searchByDay = async (type, country, timeZone) => {
 			renderAlert(`No results for selected day.`);
 			return;
 		}
-		formatDateResults(res.data, country);
+		formatDateOutput(res.data, country);
 	} catch (err) {
 		renderAlert(err);
 	}
