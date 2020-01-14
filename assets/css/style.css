@@ -1,7 +1,8 @@
-@import url('https://fonts.googleapis.com/css?family=Barlow&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Nunito:400,700&display=swap');
+
 body {
 	background-color: #ecf0f1;
-	font-family: 'Barlow', sans-serif;
+	font-family: 'Nunito', sans-serif;
 }
 
 .container {

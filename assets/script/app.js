@@ -62,7 +62,7 @@ const formatDateResults = (res, country) => {
 	const date = moment()
 		.month(res[0].dates.month - 1)
 		.date(res[0].dates.day)
-		.format('dddd, MMMM Do');
+		.format('MMMM Do');
 
 	// Format names as list items
 	const namelist = res[0].namedays[country]
@@ -85,7 +85,7 @@ const formatNameOutput = (res, name, country) => {
 			date: moment()
 				.month(day.month - 1)
 				.date(day.day)
-				.format('dddd, MMMM Do'),
+				.format('MMMM Do'),
 			names: day.name.split(',')
 		}));
 
