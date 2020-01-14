@@ -47,8 +47,8 @@ const renderNameSearch = (name, namedays, country) => {
 					<h2 class="h3 font-weight-bold">${name}</h2>
 					<p class="date">${day.date}</p>
 					<p class="text-muted mb-0">
-						All names on this day:
-						<span class="name-list">${day.names.join(', ')}</span>
+						Other names on this day:
+						<span class="name-list">${day.names.length ? day.names : 'no one'}</span>
 					</p>
 				</div>
 			</div>`
@@ -74,9 +74,9 @@ const formatDateResults = (res, country) => {
 };
 
 // Format search results for specific name
-const formatNameOutput = (res, name, country) => {
+const formatNameOutput = (res, search, country) => {
 	// RegExp to match searched name with results
-	const pattern = new RegExp('\\b' + name + '\\b');
+	const pattern = new RegExp('\\b' + search + '\\b');
 
 	// Filter out all results that match exactly
 	const namedays = res
@@ -86,18 +86,23 @@ const formatNameOutput = (res, name, country) => {
 				.month(day.month - 1)
 				.date(day.day)
 				.format('MMMM Do'),
-			names: day.name.split(',')
+			// Remove searched name from string
+			names: day.name
+				.split(',')
+				.map(name => name.trim())
+				.filter(name => name !== search)
+				.join(', ')
 		}));
 
 	// Render alert message if there was no match
 	if (!namedays.length) {
 		renderAlert(
-			`No results for the name "${name}" in selected country (${country}).`
+			`No results for the name "${search}" in selected country (${country}).`
 		);
 		return;
 	}
 
-	renderNameSearch(name, namedays, country);
+	renderNameSearch(search, namedays, country);
 };
 
 // Get search results for specific date
