@@ -1,84 +1,55 @@
 /*
  * Name day search
  */
-const searchName = document.querySelector('#search-name');
-const searchDate = document.querySelector('#search-date');
-const searchToday = document.querySelector('#search-today');
+const searchForm = document.querySelector('#search-form');
+const searchCountry = document.querySelector('#search-country');
+const searchInput = document.querySelector('#search-input');
+const searchType = document.querySelector('#search-type');
 const searchResult = document.querySelector('#search-result');
 
-// Render a list of availabe countries
+// Get list of supported countries and render to page
 const renderCountryList = async () => {
-	// Get list of supported countries
-	const countryList = await fetchData('../assets/script/countrylist.json');
+	const countries = await getData('../assets/script/countrylist.json');
 
 	// Append countries as options to select element
-	const html = countryList
+	const html = countries
 		.map(country => {
 			return `<option value="${country.code}-${country.time}">${country.name}</option>`;
 		})
 		.join('');
 
-	document.querySelectorAll('select').forEach(el => (el.innerHTML = html));
+	document.querySelector('#search-country').innerHTML = html;
 };
 
-// Handle error messages and render to page
-const renderError = message => {
+const renderAlert = message => {
 	searchResult.innerHTML = `<div class="alert alert-warning" role="alert">${message}</div>`;
 };
 
-// Handle results for name search: format and set variables
-const handleNameResult = (res, search) => {
-	// Check if search got no results & render message
-	if (!res.results.length) {
-		renderError(`No results for the name "${search}" in selected country.`);
-		return;
-	}
-
-	// Check if searched name has an exact match in results
-	const name = res.results[0].name
-		.split(/[ ,]+/) // Reg ex to fix issue with .split(', ') not working on some countires
-		.filter(name => name.toLowerCase() === search.toLowerCase())
-		.toString();
-
-	// Render error message if searched name don't have an match
-	if (!name.length) {
-		renderError(`No results for the name "${search}" in selected country.`);
-		return;
-	}
-
-	// Remove searched name from string of names
-	const namelist = res.results[0].name
-		.split(/[ ,]+/) // Reg ex to fix issue with .split(', ') not working on some countires
-		.filter(name => name.toLowerCase() !== search.toLowerCase())
-		.join(', ');
-
-	// Format date of the name day
-	const date = moment()
-		.month(res.results[0].month - 1)
-		.date(res.results[0].day)
-		.format('dddd, MMMM Do');
-
-	// Get country name
-	const country = res['country code'];
-
-	renderNameSearch(name, namelist, date, country);
+// Render results of search by specific date/day
+const renderDateSearch = (date, namelist, country) => {
+	const html = `
+		<div class="card">
+			<div class="card-body text-center">
+				<img src="/assets/img/${country}.svg" class="flag-icon">
+				<h2 class="h3 font-weight-bold">${date}</h2>
+				<ul class="name-list">${namelist}</ul>
+			</div>
+		</div>`;
+	searchResult.innerHTML = html;
 };
 
-// Handle results for date search: format and set variables
-const handleDateSearch = (res, country) => {
-	// Check if search got no results & render message
-	if (!res.data.length) {
-		renderError('No name day found on this day.');
-		return;
-	}
+// Format results of search by specific date/day
+const formatDateResults = (res, country) => {
+	console.log(res[0]);
+
 	// Format date of the name day
 	const date = moment()
-		.month(res.data[0].dates.month - 1)
-		.date(res.data[0].dates.day)
+		.month(res[0].dates.month - 1)
+		.date(res[0].dates.day)
 		.format('dddd, MMMM Do');
 
 	// Format names as a list item
-	const namelist = res.data[0].namedays[country]
+	const namelist = res[0].namedays[country]
 		.split(', ')
 		.map(name => `<li>${name}</li>`)
 		.join('');
@@ -86,85 +57,105 @@ const handleDateSearch = (res, country) => {
 	renderDateSearch(date, namelist, country);
 };
 
-// Render results of search by specific name
-const renderNameSearch = (name, namelist, date, country) => {
-	const html = `
-		<div class="card">
-			<div class="card-body text-center">
-				<img src="/assets/img/${country}.svg" class="flag-icon">
-				<h2 class="font-weight-bold">${name}</h2>
-				<p class="date">${date}</p>
-				<p class="text-muted mb-0">
-					More on this day: 
-					<span class="name-list">${namelist.length ? namelist : 'no one'}</span>
-				</p>
-			</div>
-		</div>`;
-	searchResult.innerHTML = html;
+// Get search results by specific date
+const searchByDate = async (date, country) => {
+	const month = moment(date).month() + 1;
+	const day = moment(date).date();
+
+	// Get data and handle results
+	try {
+		const res = await getDataByDate(month, day, country);
+		if (!res.data.length) {
+			renderAlert(`No results for selected day.`);
+			return;
+		}
+		formatDateResults(res.data, country);
+	} catch (err) {
+		renderAlert(err);
+	}
 };
 
-// Render results of search by specific date
-const renderDateSearch = (date, namelist, country) => {
-	const html = `
-		<div class="card">
-			<div class="card-body text-center">
-				<img src="/assets/img/${country}.svg" class="flag-icon">
-				<h2 class="font-weight-bold">${date}</h2>
-				<ul class="name-list">${namelist}</ul>
-			</div>
-		</div>`;
-	searchResult.innerHTML = html;
+// Get search results by today/tomorrow/yesterday
+const searchByDay = async (type, country, timeZone) => {
+	// Get data and handle results
+	try {
+		const res = await getDataByDay(type, country, timeZone);
+		if (!res.data.length) {
+			renderAlert(`No results for selected day.`);
+			return;
+		}
+		formatDateResults(res.data, country);
+	} catch (err) {
+		renderAlert(err);
+	}
 };
 
-// Search by specific name when form is being submitted
-searchName.addEventListener('submit', async e => {
-	e.preventDefault();
-
-	// Get name from input field
-	const name = searchName.name.value.trim();
-
-	// Get country code of selected country
-	const country = document.querySelector('#search-country').value.slice(0, 2);
+// Get search results by specific name
+const searchByName = async (name, country) => {
+	name = name.trim();
 
 	// Get data and handle results
-	searchByName(name, country)
-		.then(res => handleNameResult(res, name))
-		.catch(renderError);
+	try {
+		const res = await getDataByName(name, country);
+		if (!res.results.length) {
+			renderAlert(
+				`No results for the name "${name}" in selected country (${country}).`
+			);
+			return;
+		}
+		formatNameResults(res.results, name, country);
+	} catch (err) {
+		renderAlert(err);
+	}
+};
+
+// Update input field based on selected search type
+const updateForm = (type, placeholder, disabled = false) => {
+	searchInput.type = type;
+	searchInput.placeholder = placeholder;
+	searchInput.disabled = disabled;
+	searchInput.value = '';
+};
+
+// Listen for changes in select element for search type
+searchType.addEventListener('change', () => {
+	const type = searchType.value;
+
+	switch (type) {
+		case 'date':
+			updateForm('date', 'Enter a date...');
+			break;
+		case 'name':
+			updateForm('text', 'Enter a name...');
+			break;
+		default:
+			updateForm('text', `Search for name day ${type}`, true);
+			break;
+	}
 });
 
-// Search by specific date when form is being submitted
-searchDate.addEventListener('submit', e => {
+searchForm.addEventListener('submit', e => {
 	e.preventDefault();
 
-	// Get date from input field and extract month and day
-	const inputDate = searchDate.date.value;
-	const month = moment(inputDate).month() + 1;
-	const day = moment(inputDate).date();
+	// Get search input
+	const country = searchCountry.value.slice(0, 2);
+	const timeZone = searchCountry.value.slice(3);
+	const input = searchInput.value;
+	const type = searchType.value;
 
-	// Get selected country and country code
-	const country = document.querySelector('#search-country').value.slice(0, 2);
-
-	// Get data and handle results
-	searchByDate(month, day, country)
-		.then(res => handleDateSearch(res, country))
-		.catch(renderError);
-});
-
-// Search for today's naming day when a country is selected
-searchToday.addEventListener('change', () => {
-	const country = searchToday.value.slice(0, 2);
-	const timeZone = searchToday.value.slice(3);
-
-	// Get data and handle results
-	searchByToday(country, timeZone)
-		.then(res => handleDateSearch(res, country))
-		.catch(renderError);
+	// Search based on input
+	switch (type) {
+		case 'date':
+			searchByDate(input, country);
+			break;
+		case 'name':
+			searchByName(input, country);
+			break;
+		default:
+			searchByDay(type, country, timeZone);
+			break;
+	}
 });
 
 // Render country list when page is being loaded
 renderCountryList();
-
-// Render todays name day when page is being loaded
-searchByToday()
-	.then(res => handleDateSearch(res, 'at'))
-	.catch(renderError);
