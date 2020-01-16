@@ -29,7 +29,7 @@ const getDataByDate = async (month, day, country) => {
 };
 
 // Search for name days today for specified country and timezone
-const getDataByDay = async (day, country, timeZone) => {
-	const query = `/${day}?timezone=${timeZone}&country=${country}`;
+const getDataByDay = async (day, country, timezone) => {
+	const query = `/${day}?timezone=${timezone}&country=${country}`;
 	return await getData(base_url + query);
 };

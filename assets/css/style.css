@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css?family=Nunito:400,600,700&display=swap');
+
 body {
 	background-color: #ecf0f1;
 	font-family: 'Nunito', sans-serif;
@@ -14,9 +15,10 @@ body {
 }
 
 .date {
-	letter-spacing: 0.1em;
-	text-transform: uppercase;
 	font-weight: 600;
+	letter-spacing: 0.1em;
+	margin-bottom: 0.8rem;
+	text-transform: uppercase;
 }
 
 span.name-list {

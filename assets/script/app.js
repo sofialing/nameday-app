@@ -107,6 +107,7 @@ const formatNameOutput = (res, searchedName, country) => {
 			// Remove searched name from string of names
 			names: day.name
 				.split(',')
+				.map(name => name.trim())
 				.filter(name => !pattern.test(name))
 				.join(', ')
 		}));
@@ -141,10 +142,10 @@ const searchByDate = async (date, country) => {
 };
 
 // Get search results for today / tomorrow / yesterday
-const searchByDay = async (type, country, timeZone) => {
+const searchByDay = async (type, country, timezone) => {
 	// Get data and handle results
 	try {
-		const res = await getDataByDay(type, country, timeZone);
+		const res = await getDataByDay(type, country, timezone);
 		if (!res.data.length) {
 			renderAlert(`No results for selected day.`);
 			return;
@@ -162,6 +163,7 @@ const searchByName = async (name, country) => {
 
 	// Check if searched name has an valid length
 	if (name.length < 3) {
+		renderAlert('Name must be at least 3 characters long.')
 		return;
 	}
 
@@ -242,3 +244,4 @@ searchForm.addEventListener('submit', e => {
 // Render countries & timezones when page is being loaded
 renderCountryList();
 renderTimezoneList();
+searchForm.reset();
