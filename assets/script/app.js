@@ -1,11 +1,12 @@
 /*
  * Name day search
  */
-const searchForm = document.querySelector('#search-form');
 const searchCountry = document.querySelector('#search-country');
+const searchForm = document.querySelector('#search-form');
 const searchInput = document.querySelector('#search-input');
-const searchType = document.querySelector('#search-type');
 const searchResult = document.querySelector('#search-result');
+const searchTimezone = document.querySelector('#search-timezone');
+const searchType = document.querySelector('#search-type');
 
 // Render alert message to page
 const renderAlert = message => {
@@ -14,15 +15,30 @@ const renderAlert = message => {
 
 // Render list of supported countries to page
 const renderCountryList = async () => {
-	// Get data from json
+	// Get list of countries from json and sort array by name
 	const countries = await getData('assets/script/countrylist.json');
+	countries.sort((a, b) => a.name > b.name);
 
 	// Append countries as options to select element
 	const html = countries
-		.map(c => `<option value="${c.code}-${c.time}">${c.name}</option>`)
+		.map(country => `<option value="${country.code}">${country.name}</option>`)
 		.join('');
 
 	searchCountry.innerHTML = html;
+};
+
+// Render list of supported timezones to page
+const renderTimezoneList = async () => {
+	// Get list of countries from json and sort array by timezone
+	const timezones = await getData('assets/script/countrylist.json');
+	timezones.sort((a, b) => a.time > b.time);
+
+	// Append timezones as options to select element
+	const html = timezones
+		.map(timezone => `<option value="${timezone.time}">${timezone.time}</option>`)
+		.join('');
+
+	searchTimezone.innerHTML = html;
 };
 
 // Render search results for specific date / day to page
@@ -38,25 +54,25 @@ const renderDateSearch = (date, namelist, country) => {
 				</p>
 			</div>
 		</div>`;
+
 	searchResult.innerHTML = html;
 };
 
 // Render search results for specific name to page
 const renderNameSearch = (name, namedays, country) => {
-	const html = namedays.map(
-		day =>
-			`<div class="card mb-3">
-				<div class="card-body text-center">
-					<img src="assets/img/${country}.svg" class="flag-icon">
-					<h2 class="h3 font-weight-bold">${name}</h2>
-					<p class="date">${day.date}</p>
-					<p class="text-muted mb-0">
-						Other names on this day:
-						<span class="name-list">${day.names.length ? day.names : 'no one'}</span>
-					</p>
-				</div>
-			</div>`
-	);
+	const html = namedays.map(day =>
+		`<div class="card mb-3">
+			<div class="card-body text-center">
+				<img src="assets/img/${country}.svg" class="flag-icon">
+				<h2 class="h3 font-weight-bold">${name}</h2>
+				<p class="date">${day.date}</p>
+				<p class="text-muted mb-0">
+					Other names on this day:
+					<span class="name-list">${day.names.length ? day.names : 'no one'}</span>
+				</p>
+			</div>
+		</div>`);
+
 	searchResult.innerHTML = html.join('');
 };
 
@@ -64,20 +80,21 @@ const renderNameSearch = (name, namedays, country) => {
 const formatDateOutput = (res, country) => {
 	// Format the date of the the name day
 	const date = moment()
-		.month(res[0].dates.month - 1)
-		.date(res[0].dates.day)
+		.month(res.dates.month - 1)
+		.date(res.dates.day)
 		.format('MMMM Do');
 
 	// Get list of names
-	const namelist = res[0].namedays[country];
+	const namelist = res.namedays[country];
 
+	// Render results to page
 	renderDateSearch(date, namelist, country);
 };
 
 // Format search results for specific name
-const formatNameOutput = (res, search, country) => {
-	// RegExp to match searched name with results
-	const pattern = new RegExp('\\b' + search + '\\b');
+const formatNameOutput = (res, searchedName, country) => {
+	// Regex to match searched name with results
+	const pattern = new RegExp('\\b' + searchedName + '\\b');
 
 	// Filter out all results that match exactly
 	const namedays = res
@@ -87,21 +104,21 @@ const formatNameOutput = (res, search, country) => {
 				.month(day.month - 1)
 				.date(day.day)
 				.format('MMMM Do'),
-			// Remove searched name from string
+			// Remove searched name from string of names
 			names: day.name
 				.split(',')
-				.map(name => name.trim())
-				.filter(name => name !== search)
+				.filter(name => !pattern.test(name))
 				.join(', ')
 		}));
 
-	// Render alert message if there was no match
+	// Render alert message if there was no exact match
 	if (!namedays.length) {
-		renderAlert(`No results for the name "${search}" in selected country.`);
+		renderAlert(`No results for the name "${searchedName}" in selected country.`);
 		return;
 	}
 
-	renderNameSearch(search, namedays, country);
+	// Render results to page
+	renderNameSearch(searchedName, namedays, country);
 };
 
 // Get search results for specific date
@@ -117,7 +134,7 @@ const searchByDate = async (date, country) => {
 			renderAlert(`No results for selected day.`);
 			return;
 		}
-		formatDateOutput(res.data, country);
+		formatDateOutput(res.data[0], country);
 	} catch (err) {
 		renderAlert(err);
 	}
@@ -132,7 +149,7 @@ const searchByDay = async (type, country, timeZone) => {
 			renderAlert(`No results for selected day.`);
 			return;
 		}
-		formatDateOutput(res.data, country);
+		formatDateOutput(res.data[0], country);
 	} catch (err) {
 		renderAlert(err);
 	}
@@ -140,17 +157,22 @@ const searchByDay = async (type, country, timeZone) => {
 
 // Get search results for specific name
 const searchByName = async (name, country) => {
-	// Trim input and convert first letter to uppercase
+	// Trim input
 	name = name.trim();
+
+	// Check if searched name has an valid length
+	if (name.length < 3) {
+		return;
+	}
+
+	// Convert first letter to uppercase
 	name = name[0].toUpperCase() + name.substr(1);
 
 	// Get data and handle results
 	try {
 		const res = await getDataByName(name, country);
 		if (!res.results.length) {
-			renderAlert(
-				`No results for the name "${name}" in selected country (${country}).`
-			);
+			renderAlert(`No results for the name "${name}" in selected country.`);
 			return;
 		}
 		formatNameOutput(res.results, name, country);
@@ -159,17 +181,24 @@ const searchByName = async (name, country) => {
 	}
 };
 
-// Update input field based on selected search type
+// Update search form based on selected search type
 const updateForm = (type, placeholder, disabled = false) => {
 	searchInput.type = type;
 	searchInput.placeholder = placeholder;
 	searchInput.disabled = disabled;
 	searchInput.value = '';
+
+	// Show/hide list of timezones
+	if (disabled) {
+		document.querySelector('#timezones').className = 'col-12';
+	} else {
+		document.querySelector('#timezones').className = 'col-12 d-none';
+	}
 };
 
 // Handle when user interacts with the search type element
 searchType.addEventListener('change', () => {
-	// Get search type
+	// Get search type (name, date or day)
 	const type = searchType.value;
 
 	// Update input field based on type
@@ -191,8 +220,8 @@ searchForm.addEventListener('submit', e => {
 	e.preventDefault();
 
 	// Get search input
-	const country = searchCountry.value.slice(0, 2);
-	const timeZone = searchCountry.value.slice(3);
+	const country = searchCountry.value;
+	const timezone = searchTimezone.value;
 	const input = searchInput.value;
 	const type = searchType.value;
 
@@ -205,10 +234,11 @@ searchForm.addEventListener('submit', e => {
 			searchByName(input, country);
 			break;
 		default:
-			searchByDay(type, country, timeZone);
+			searchByDay(type, country, timezone);
 			break;
 	}
 });
 
-// Render country list when page is being loaded
+// Render countries & timezones when page is being loaded
 renderCountryList();
+renderTimezoneList();
